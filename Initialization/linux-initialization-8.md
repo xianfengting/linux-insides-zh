@@ -1,14 +1,14 @@
-Kernel initialization. Part 8.
+内核初始化 第八部分
 ================================================================================
 
-Scheduler initialization
+调度器的初始化
 ================================================================================
 
-This is the eighth [part](https://0xax.gitbooks.io/linux-insides/content/Initialization/index.html) of the Linux kernel initialization process chapter and we stopped on the `setup_nr_cpu_ids` function in the [previous part](https://github.com/0xAX/linux-insides/blob/master/Initialization/linux-initialization-7.md).
+这里是内核初始化章节的[第八部分](https://0xax.gitbooks.io/linux-insides/content/Initialization/index.html)，在[上一部分](https://github.com/0xAX/linux-insides/blob/master/Initialization/linux-initialization-7.md)中我们结束在 `setup_nr_cpu_ids` 函数。
 
-The main point of this part is [scheduler](http://en.wikipedia.org/wiki/Scheduling_%28computing%29) initialization. But before we will start to learn initialization process of the scheduler, we need to do some stuff. The next step in the [init/main.c](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/init/main.c) is the `setup_per_cpu_areas` function. This function setups memory areas for the `percpu` variables, more about it you can read in the special part about the [Per-CPU variables](https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-1.html). After `percpu` areas is up and running, the next step is the `smp_prepare_boot_cpu` function.
+本部分主要内容是[调度器](http://en.wikipedia.org/wiki/Scheduling_%28computing%29)的初始化。但是在了解调度器的初始化过程之前，我们需要做一些事情。[init/main.c](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/init/main.c) 文件中的下一步是 `setup_per_cpu_areas` 函数。该函数为 `percpu` 变量设置内存区域，你可以在 [Per-CPU 变量](https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-1.html) 特别章节中了解更多信息。在 `percpu` 区域设置并运行之后，下一步就是 `smp_prepare_boot_cpu` 函数。
 
-This function does some preparations for [symmetric multiprocessing](http://en.wikipedia.org/wiki/Symmetric_multiprocessing). Since this function is architecture specific, it is located in the [arch/x86/include/asm/smp.h](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/arch/x86/include/asm/smp.h#L78) Linux kernel header file. Let's look at the definition of this function:
+该函数为[对称多处理](http://en.wikipedia.org/wiki/Symmetric_multiprocessing)做一些准备工作。因为该函数特定于体系结构，所以它被放在 Linux 内核头文件 [arch/x86/include/asm/smp.h](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/arch/x86/include/asm/smp.h#L78) 中。让我们看一看这个函数的定义：
 
 ```C
 static inline void smp_prepare_boot_cpu(void)
