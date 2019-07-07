@@ -8,7 +8,7 @@
 
 本部分主要内容是[调度器](http://en.wikipedia.org/wiki/Scheduling_%28computing%29)的初始化。但是在了解调度器的初始化过程之前，我们需要做一些事情。[init/main.c](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/init/main.c) 文件中的下一步是 `setup_per_cpu_areas` 函数。该函数为 `percpu` 变量设置内存区域，你可以在 [Per-CPU 变量](https://0xax.gitbooks.io/linux-insides/content/Concepts/linux-cpu-1.html) 特别章节中了解更多信息。在 `percpu` 区域设置并运行之后，下一步就是 `smp_prepare_boot_cpu` 函数。
 
-该函数为[对称多处理](http://en.wikipedia.org/wiki/Symmetric_multiprocessing)做一些准备工作。因为该函数特定于体系结构，所以它被放在 Linux 内核头文件 [arch/x86/include/asm/smp.h](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/arch/x86/include/asm/smp.h#L78) 中。让我们看一看这个函数的定义：
+该函数为[对称多处理](http://en.wikipedia.org/wiki/Symmetric_multiprocessing)做一些准备工作。因为该函数特定于体系结构，所以它被放在 Linux 内核头文件 [arch/x86/include/asm/smp.h](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/arch/x86/include/asm/smp.h#L78) 中。让我们来看一看这个函数的定义：
 
 ```C
 static inline void smp_prepare_boot_cpu(void)
@@ -17,7 +17,7 @@ static inline void smp_prepare_boot_cpu(void)
 }
 ```
 
-We may see here that it just calls the `smp_prepare_boot_cpu` callback of the `smp_ops` structure. If we look at the definition of instance of this structure from the [arch/x86/kernel/smp.c](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/arch/x86/kernel/smp.c) source code file, we will see that the `smp_prepare_boot_cpu` expands to the call of the `native_smp_prepare_boot_cpu` function:
+我们看到它仅仅调用了 `smp_ops` 结构体的  `smp_prepare_boot_cpu` 回调函数。如果我们查看 [arch/x86/kernel/smp.c](https://github.com/torvalds/linux/blob/16f73eb02d7e1765ccab3d2018e0bd98eb93d973/arch/x86/kernel/smp.c) 文件中这个结构体的定义，就会发现 `smp_prepare_boot_cpu` 转换为调用 `native_smp_prepare_boot_cpu` 函数：
 
 ```C
 struct smp_ops smp_ops = {
@@ -32,7 +32,7 @@ struct smp_ops smp_ops = {
 EXPORT_SYMBOL_GPL(smp_ops);
 ```
 
-The `native_smp_prepare_boot_cpu` function looks:
+`native_smp_prepare_boot_cpu` 函数的定义：
 
 ```C
 void __init native_smp_prepare_boot_cpu(void)
@@ -44,7 +44,7 @@ void __init native_smp_prepare_boot_cpu(void)
 }
 ```
 
-and executes following things: first of all it gets the `id` of the current CPU (which is Bootstrap processor and its `id` is zero for this moment) with the `smp_processor_id` function. I will not explain how the `smp_processor_id` works, because we already saw it in the [Kernel entry point](https://0xax.gitbooks.io/linux-insides/content/Initialization/linux-initialization-4.html) part. After we've got processor `id` number we reload [Global Descriptor Table](http://en.wikipedia.org/wiki/Global_Descriptor_Table) for the given CPU with the `switch_to_new_gdt` function:
+该函数进行以下操作：首先，它使用 `smp_processor_id` 函数获取当前CPU的ID（即引导处理器，此时其ID为零）。因为我们已经在[内核入口点](https://0xax.gitbooks.io/linux-insides/content/Initialization/linux-initialization-4.html)部分看到了它，所以我在这里不会解释它的工作原理。当我们得到 CPU 的 `id` 号后，我们用 `switch_to_new_gdt` 函数重新加载给定CPU的全局描述符表：
 
 ```C
 void switch_to_new_gdt(int cpu)
