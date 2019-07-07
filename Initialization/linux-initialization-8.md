@@ -58,7 +58,7 @@ void switch_to_new_gdt(int cpu)
 }
 ```
 
-The `gdt_descr` variable represents pointer to the `GDT` descriptor here (we already saw definition of a `desc_ptr` structure in the [Early interrupt and exception handling](https://0xax.gitbooks.io/linux-insides/content/Initialization/linux-initialization-2.html) part). We get the address and the size of the `GDT` descriptor for the `CPU` with the given `id`. The `GDT_SIZE` is `256` or:
+`gdt_descr` 变量表示指向 `GDT` 描述符的指针（我们已经在[早期中断和异常处理](https://0xax.gitbooks.io/linux-insides/content/Initialization/linux-initialization-2.html)部分看到了一个 `desc_ptr` 结构的定义）。我们得到具有给定 `id` 值的 `CPU` 的 `GDT` 描述符的地址和大小。 `GDT_SIZE` 的值是 256 或：
 
 ```C
 #define GDT_SIZE (GDT_ENTRIES * 8)
